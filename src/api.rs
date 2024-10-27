@@ -1,19 +1,20 @@
 // API Handline
 use reqwest;
 use serde_json;
+use urlencoding::encode;
 
-// API Data Structs
+// Github API Data Structs
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct GitHubRepos {
-    total_count: i32,
-    incomplete_results: bool,
+    total_count: Option<i32>,
+    incomplete_results: Option<bool>,
     items: Vec<Repository>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-struct Repository {
+pub struct Repository {
     id: i32,
     node_id: String,
     name: String,
@@ -120,31 +121,35 @@ struct License {
     node_id: String,
 }
 
-// API callers
-pub async fn get_data(url: &str) -> Result<GitHubRepos, Box<dyn std::error::Error>>{
-    let cli = reqwest::Client::new();
+pub async fn get(query: &str) -> Result<GitHubRepos, Box<dyn std::error::Error>>{
+    // Create url
+    let query = encode(query);
+    let url = format!("https://api.github.com/search/repositories?q={}&sort=stars&order=desc&per_page=10&page=1", query);
     
+    // Create header
     let mut headers = reqwest::header::HeaderMap::new();
+
     headers.insert(
         reqwest::header::USER_AGENT, 
         reqwest::header::HeaderValue::from_static("MyCustomUserAgent/1.0")
     );
 
-    let req = cli
-        .get(url)
+    // Make API call
+    let client = reqwest::Client::new();
+    let req = client 
+        .get(&url)
         .headers(headers)
         .send()
         .await;
 
+    // Process response
     match req {
         Ok(req) => {
             let res_raw = req.text().await.expect("failed to get response text");
             let res: GitHubRepos = serde_json::from_str(&res_raw).expect("Error parsing response text");
-
-            println!("{:#?}", res);
-            return Ok(res);        
+            return Ok(res);
         },
-        
+
         Err(e) => {
             return Err(Box::new(e));
         }, 
