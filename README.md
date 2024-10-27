@@ -1,1 +1,3 @@
 # Rusty Backend
+
+Small scale backend side project, let's see where it goes...
