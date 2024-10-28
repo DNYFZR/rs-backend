@@ -3,32 +3,27 @@ mod api;
 mod database;
 mod structs;
 
-use serde_json;
-use std::fs;
-
 #[tokio::main]
 async fn main() {
     // Program input
     let user_search:Vec<_> = std::env::args().collect();
 
     if user_search.len() > 1 {
-        println!("Searching for : {:#?}", user_search[1]);
+        let search_term = user_search[1].clone();
+        let table_name = search_term.replace(" ", "-");
+        println!("Searching for : {:#?}", search_term);
 
         // Process API call
-        let raw_data = api::get(&user_search[1])
+        let api_data = api::get(&search_term)
             .await
             .expect("failed to call API");
-        
-        let json_data = serde_json::to_string_pretty(&raw_data)
-            .expect("failed to parse json");
 
-        // Write out    
-        fs::write(
-            format!("database/{}.json", user_search[1].replace(" ", "-")),
-            json_data
-        ).expect("failed to write json file");
-        
-        println!("Output written to : {}.json", user_search[1].replace(" ", "-"));
+        // Update DB
+        match database::update(&table_name, api_data) {
+            Ok(_) => println!("DB table {table_name} updated"),
+            Err(e) => println!("Error : {e}"),
+        }
+
         println!("|--- SUCCESS ---|");
     } 
     
