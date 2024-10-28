@@ -1,6 +1,7 @@
 // Application Backend 
 mod api;
 mod database;
+mod structs;
 
 use serde_json;
 use std::fs;
