@@ -1,7 +1,7 @@
 # Rusty Backend
 
 [![CI-Pipeline](https://github.com/DNYFZR/rusty-backend/actions/workflows/test.yaml/badge.svg)](https://github.com/DNYFZR/rusty-backend/actions/workflows/test.yaml)
-[![CD-Pipeline](https://github.com/DNYFZR/rusty-backend/actions/workflows/run.yaml/badge.svg)](https://github.com/DNYFZR/rusty-backend/actions/workflows/run.yaml)
+[![CD-Pipeline](https://github.com/DNYFZR/rusty-backend/actions/workflows/build.yaml/badge.svg)](https://github.com/DNYFZR/rusty-backend/actions/workflows/build.yaml)
 
 Side project which runs searches of the Github API and store the results in a NoSQL styled SQLite database.
 
