@@ -4,23 +4,25 @@ on:
   schedule: # every hour
     - cron: 0 * * * *
 
+permissions:
+  contents: write
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 jobs:
-  deploy-app:
+  Deploy:
+    # Rust is preconfigured on the ubuntu-latest runner
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       
-      - name: Set up Rust
-        uses: hecrj/setup-rust-action@v1
-        with:
-          rust-version: stable
-      
-      - name: Build Rust module
+      - name: Build App
         run: cargo build --release
       
-      - name: Run Rust module with CLI arguments
+      - name: Run App
         run: |
           args_list=("--'rust'" "--'typescript'" "--'react'" "--'machine learning'" "--'typescript react'" "--'typescript express'")
           for arg in "${args_list[@]}"; do
-            ./target/release/your-binary-name $arg
+            ./target/release/rusty-backend $arg
           done
