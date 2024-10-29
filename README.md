@@ -21,4 +21,4 @@ Within the `.github/workflows` directory :
 
 - `test.yaml` : runs testing of the application on changes to the main branch
 
-- The `run.yaml` : schedules a run of the modules & updated of the DB every 6hrs
+- `run.yaml` : schedules a run of the modules & updated of the DB on a schedule for a defined range of search terms
