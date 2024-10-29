@@ -2,7 +2,7 @@ name: CD-Pipeline
 
 on:
   schedule: # every hour
-    - cron: 0 * * * *
+    - cron: 0 */3 * * *
 
 permissions:
   contents: write
@@ -22,7 +22,7 @@ jobs:
       
       - name: Run App
         run: |
-          args_list=("--'rust'" "--'typescript'" "--'react'" "--'machine learning'" "--'typescript react'" "--'typescript express'")
+          args_list=("--rust" "--typescript" "--react" "--machine learning" "--typescript react" "--typescript express")
           for arg in "${args_list[@]}"; do
-            ./target/release/rusty-backend $arg
+            ./target/release/rusty-backend "$arg"
           done
