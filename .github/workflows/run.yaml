@@ -5,19 +5,22 @@ on:
     - cron: 0 */6 * * * 
 
 jobs:
-  run:
+  deployment:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      
       - name: Set up Rust
         uses: hecrj/setup-rust-action@v1
         with:
           rust-version: stable
+      
       - name: Build Rust module
         run: cargo build --release
+      
       - name: Run Rust module with CLI arguments
         run: |
-          args_list=("--'rust'" "--'typescript'" "--'react'" "--'machine learning'")
+          args_list=("--'rust'" "--'typescript'" "--'react'" "--'machine learning'" "--'typescript react'" "--'typescript express'")
           for arg in "${args_list[@]}"; do
             ./target/release/your-binary-name $arg
           done
