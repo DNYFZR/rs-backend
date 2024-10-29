@@ -1,7 +1,7 @@
 name: CD-Pipeline
 
 on:
-  schedule: # every hour
+  schedule:
     - cron: 0 */3 * * *
 
 permissions:
@@ -12,17 +12,40 @@ env:
 
 jobs:
   Deploy:
-    # Rust is preconfigured on the ubuntu-latest runner
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
       - name: Build App
         run: cargo build --release
-      
+
       - name: Run App
         run: |
           args_list=("--rust" "--typescript" "--react" "--machine learning" "--typescript react" "--typescript express")
           for arg in "${args_list[@]}"; do
             ./target/release/rusty-backend "$arg"
           done
+
+      - name: Commit changes
+        id: commit
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add -A
+          if git diff --quiet; then
+            echo "No changes to commit"
+            echo "::set-output name=push::false"
+          else
+            git commit -m "Update database" -a
+            echo "::set-output name=push::true"
+          fi
+
+      - name: Push changes
+        if: steps.commit.outputs.push == 'true'
+        uses: ad-m/github-push-action@v0.6.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: main
