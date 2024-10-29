@@ -2,13 +2,10 @@ name: CD-Pipeline
 
 on:
   schedule:
-    - cron: 0 */3 * * *
+    - cron: 0,30 */3 * * *
 
 permissions:
   contents: write
-
-env:
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   Deploy:
@@ -24,9 +21,9 @@ jobs:
 
       - name: Run App
         run: |
-          args_list=("--rust" "--typescript" "--react" "--machine learning" "--typescript react" "--typescript express")
+          args_list=("rust" "typescript" "react" "machine learning" "typescript react" "typescript express")
           for arg in "${args_list[@]}"; do
-            ./target/release/rusty-backend "$arg"
+            ./target/release/rusty-backend -- "$arg"
           done
 
       - name: Commit changes
@@ -35,16 +32,9 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add -A
-          if git diff --quiet; then
-            echo "No changes to commit"
-            echo "::set-output name=push::false"
-          else
-            git commit -m "Update database" -a
-            echo "::set-output name=push::true"
-          fi
-
+          git commit -m "Actions database update" -a
+          
       - name: Push changes
-        if: steps.commit.outputs.push == 'true'
         uses: ad-m/github-push-action@v0.6.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
