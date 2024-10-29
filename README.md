@@ -14,3 +14,11 @@ The DB contains a single table with two columns :
 
 - name : text primary key
 - data : JSON
+
+## Deployment
+
+Within the `.github/workflows` directory :
+
+- `test.yaml` : runs testing of the application on changes to the main branch
+
+- The `run.yaml` : schedules a run of the modules & updated of the DB every 6hrs
