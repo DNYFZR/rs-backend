@@ -40,3 +40,18 @@ pub async fn get(query: &str) -> Result<Vec<Repository>, Box<dyn std::error::Err
         }, 
     }
 }
+
+#[cfg(test)]
+mod api_tests {
+    use super::get;
+
+    #[tokio::test]
+    async fn test_get() {
+        let test = get("rust").await;
+
+        match test {
+            Ok(res) => println!("success: {:#?}", res[0].name),
+            Err(e) => println!("error : {e}"),
+        }
+    }
+}

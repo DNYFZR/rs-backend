@@ -12,7 +12,7 @@ pub struct GitHubRepos {
 pub struct Repository {
     id: i32,
     node_id: String,
-    name: String,
+    pub name: String,
     full_name: String,
     private: bool,
     owner: Owner,
