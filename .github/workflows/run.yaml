@@ -1,11 +1,11 @@
 name: CD-Pipeline
 
 on:
-  schedule: # every 30 mins
-    - cron: 0,30 */1 * * *
+  schedule: # every hour
+    - cron: 0 * * * *
 
 jobs:
-  deployment:
+  deploy-app:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
