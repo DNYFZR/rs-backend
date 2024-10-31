@@ -21,6 +21,30 @@ fn connect(database: &str, table:&str) -> Connection {
     return conn;
 }
 
+pub fn query(database: &str, table:&str, sql: &str) -> Vec<String> {
+    //  Query the DB table
+    let conn = connect(database, table);
+    
+    let mut stmt = conn.prepare(sql)
+        .expect("database rejected the query ststement");
+    
+    // Need to add better row extraction here - get all ???
+    let rows = stmt.query_map([], |row| row.get::<usize, String>(0))
+        .expect("query error");
+
+    let mut data:Vec<String> = Vec::new();
+    
+    for (idx, item) in rows.enumerate() {
+        match item {
+            Ok(res) => data.push(res),
+            Err(e) => println!("error : no data at index {idx} ( {e} )"),
+        }
+    }
+
+    println!("{:#?}", data);
+
+    return data;   
+}
 
 pub fn update(table:&str, name:&str, data:Vec<Repository>) -> Result<(), serde_json::Error> {
     let conn = connect(DB, table);
@@ -45,8 +69,7 @@ pub fn update(table:&str, name:&str, data:Vec<Repository>) -> Result<(), serde_j
 mod db_testing {
     use std::fs::File;
     use std::io::Read;
-
-    use super::{DB, Repository, connect, update};
+    use super::{DB, Repository, connect, query, update};
     
     const TEST_TABLE:&str = "testing";
 
@@ -64,12 +87,15 @@ mod db_testing {
             names.push(name_result);
         }
 
-        println!("{:#?}", names);
-        
-        // match test {
-        //     Ok(_) => println!("success : connected to app DB"),
-        //     Err(e) => println!("failed : connect to app DB ({e})"),
-        // }
+        println!("{:#?}", names);  
+    }
+
+    #[test]
+    fn test_query() {
+        let sql = "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name;";
+        let test = query(DB, TEST_TABLE, sql);
+
+        assert_eq!(vec!["api_data", "testing"], test);
     }
 
     #[test]
@@ -89,5 +115,6 @@ mod db_testing {
             Ok(_) => println!("DB table {TEST_TABLE} updated at key {test_name}"),
             Err(e) => println!("Error : {e}"),
         }
-    }    
+    } 
+
 }
