@@ -23,7 +23,7 @@ jobs:
         run: |
           args_list=("rust" "typescript" "react" "machine learning" "typescript react" "typescript express")
           for arg in "${args_list[@]}"; do
-            ./target/release/rusty-backend --"$arg"
+            ./target/release/rusty-backend "$arg"
           done
 
       - name: Commit changes
