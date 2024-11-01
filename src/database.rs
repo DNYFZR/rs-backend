@@ -64,12 +64,24 @@ pub fn update(table:&str, name:&str, data:Vec<Repository>) -> Result<(), serde_j
      }
 }
 
+pub fn delete(table:&str, name:&str) -> Result<(), rusqlite::Error> {
+    let conn = connect(DB, table);
+    let query = conn.execute(&format!("DELETE FROM {} WHERE name = ?1", table), (name, ));
+    
+    match query {
+        Ok(_) => return Ok(()),
+        Err(e) => {
+            println!("error : {e}");
+            return Err(e);
+        },
+     }
+}
 
 #[cfg(test)]
 mod db_testing {
     use std::fs::File;
     use std::io::Read;
-    use super::{DB, Repository, connect, query, update};
+    use super::{DB, Repository, connect, query, update, delete};
     
     const TEST_TABLE:&str = "testing";
 
@@ -116,5 +128,28 @@ mod db_testing {
             Err(e) => println!("Error : {e}"),
         }
     } 
+
+    #[test]
+    fn test_delete() {
+        let table = "delete_test";
+
+        // Bring in test dataset
+        let mut test_data = String::new();
+        File::open("testing/rust.json")
+            .expect("could not access test data")
+            .read_to_string(&mut test_data)
+            .expect("could not parse test data");
+        
+        // Add test table for delete
+        let test_data:Vec<Repository> = serde_json::from_str(&test_data).expect("failed to parse to JSON"); 
+        update("testing", table, test_data)
+            .expect("failed to update delete_test table");
+
+        // Test delete method
+        let test = delete("testing", table)
+            .expect("failed to execute delete test");
+        
+        assert_eq!(test, ());
+    }
 
 }
